@@ -20,7 +20,7 @@ class Home extends StatelessWidget {
 
             Expanded(
               child: ListView.builder(
-                itemCount: 5, // Replace with API response count
+                itemCount: 1, // Replace with API response count
                 itemBuilder: (context, index) {
                   return Card(
                     margin: EdgeInsets.only(bottom: 12),
@@ -29,7 +29,7 @@ class Home extends StatelessWidget {
                     child: ListTile(
                       leading: Icon(Icons.restaurant_menu, color: Colors.orangeAccent),
                       title: Text("Recipe Name $index"), // Replace with API data
-                      subtitle: Text("Calories: 250 kcal"),
+                      subtitle: Text("Calories: "),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // Navigate to recipe details

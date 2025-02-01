@@ -23,9 +23,7 @@ class _ExploreState extends State<Explore> {
     setState(() {
       recipes = fetchedRecipes;
     });
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +32,7 @@ class _ExploreState extends State<Explore> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Icon(
-          Icons.sort,
-          color: Colors.black,
-        ),
+
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16),
@@ -63,12 +58,13 @@ class _ExploreState extends State<Explore> {
               ),
             ),
             SizedBox(height: 24),
+            // First part: Show only the first 5 items horizontally
             Container(
               height: 350,
               child: ListView.builder(
                 physics: BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
-                itemCount: recipes.length,
+                itemCount: recipes.length < 5 ? recipes.length : 5, // Show only 5 items
                 itemBuilder: (context, index) {
                   return buildRecipe(recipes[index], index);
                 },
@@ -85,11 +81,12 @@ class _ExploreState extends State<Explore> {
                 ],
               ),
             ),
+            // Second part: Show all the recipes vertically
             Container(
               height: 190,
               child: PageView.builder(
                 physics: BouncingScrollPhysics(),
-                itemCount: recipes.length,
+                itemCount: recipes.length, // Show all recipes
                 itemBuilder: (context, index) {
                   return buildPopular(recipes[index]);
                 },
@@ -127,7 +124,7 @@ class _ExploreState extends State<Explore> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(recipe.image), // Updated to use NetworkImage
+                      image: NetworkImage(recipe.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -144,41 +141,48 @@ class _ExploreState extends State<Explore> {
   }
 
   Widget buildPopular(Recipe recipe) {
-    return Container(
-      margin: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        boxShadow: [kBoxShadow],
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 160,
-            width: 160,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(recipe.image), // Updated to use NetworkImage
-                fit: BoxFit.fitHeight,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Detail(recipe: recipe)),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          boxShadow: [kBoxShadow],
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 160,
+              width: 160,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(recipe.image),
+                  fit: BoxFit.fitHeight,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  buildRecipeTitle(recipe.title),
-                  buildTextSubTitleVariation2("${recipe.calories} Kcal | ${recipe.protein}g Protein | ${recipe.prepTime} min"),
-                ],
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    buildRecipeTitle(recipe.title),
+                    buildTextSubTitleVariation2("${recipe.calories} Kcal | ${recipe.protein}g Protein | ${recipe.prepTime} min"),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
-

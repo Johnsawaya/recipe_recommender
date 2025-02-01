@@ -145,24 +145,7 @@ class Detail extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {}, 
-        backgroundColor: kPrimaryColor,
-        icon: Icon(
-          Icons.play_circle_fill,
-          color: Colors.white,
-          size: 32,
-        ),
-        label: Text(
-          "Watch Video",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        )
-      ),
+
     );
   }
 

@@ -3,7 +3,7 @@ import 'Home.dart';
 import 'Explore.dart';
 import 'Favorites.dart';
 import 'Profile.dart';
-
+import 'Design.dart';
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -13,7 +13,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    Home(), // AI-generated recommendations
+    Home(),
     Explore(), // Browse all recipes
     Favorites(), // Saved recipes
     Profile(), // User info
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.orangeAccent,
+        selectedItemColor: kPrimaryColor,
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
         onTap: _onItemTapped,
