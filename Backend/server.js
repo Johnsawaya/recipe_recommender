@@ -83,7 +83,7 @@ app.post('/api/register', async (req, res) => {
 app.get("/api/recipes", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, title, image_url, calories, protein, prep_time FROM recipes"
+      "SELECT * FROM recipes"
     );
     res.status(200).json(result.rows);
   } catch (err) {
