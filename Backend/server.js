@@ -78,6 +78,21 @@ app.post('/api/register', async (req, res) => {
 });
 
 
+
+// Fetch Recipes
+app.get("/api/recipes", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, title, image, calories, protein, prep_time FROM recipes"
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching recipes:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+
 // Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
