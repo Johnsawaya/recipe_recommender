@@ -1,6 +1,12 @@
 # recipe_recommender
 
-A new Flutter project.
+Mobile Programming course: Group 5
+
+John Sawaya
+Charbel Kiwan
+Elie Bou Naoum
+Karen Kdeissy
+Elissa Merhi
 
 ## Getting Started
 
