@@ -41,6 +41,7 @@ app.post("/login", async (req, res) => {
       return res.status(200).json({
         message: "Login successful",
         user: result.rows[0], // Include user info from auth_users table
+        userId: userId, // Include the user ID
       });
     } else {
       // Passwords don't match
@@ -91,6 +92,84 @@ app.get("/api/recipes", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
+
+
+
+// Fetch user data from the database
+async function fetchUserData(userId) {
+  const query = 'SELECT age, height, weight, health_goal FROM users WHERE auth_id = $1';
+  const result = await pool.query(query, [userId]);
+  return result.rows[0];
+}
+
+// Fetch recipes from the database
+async function fetchRecipesFromDatabase() {
+  const query = 'SELECT title, calories, protein, ingredients, steps FROM recipes';
+  const result = await pool.query(query);
+  return result.rows;
+}
+
+// Generate meal plan using ChatGPT
+async function generateMealPlan(userData, recipes) {
+  const { age, height, weight, health_goal } = userData;
+
+  // Calculate calorie intake
+  const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; // For men
+  const calorieIntake = bmr * activityLevelMultiplier[health_goal];
+
+  // Call ChatGPT API
+  const chatGPTResponse = await axios.post(
+    'https://api.openai.com/v1/chat/completions',
+    {
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a nutritionist and meal planner.',
+        },
+        {
+          role: 'user',
+          content: `Create a meal plan for a user with the following data: Age: ${age}, Height: ${height}, Weight: ${weight}, Health Goal: ${health_goal}, Daily Calorie Intake: ${calorieIntake}. Recipes: ${JSON.stringify(recipes)}`,
+        },
+      ],
+    },
+    {
+      headers: {
+        'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
+      },
+    }
+  );
+
+  return chatGPTResponse.data.choices[0].message.content;
+}
+
+// API endpoint to generate meal plan
+app.post('/meal-plan', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    // Fetch user data from the database
+    const userData = await fetchUserData(userId);
+    if (!userData) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Fetch recipes from the database
+    const recipes = await fetchRecipesFromDatabase();
+
+    // Generate meal plan using ChatGPT
+    const mealPlan = await generateMealPlan(userData, recipes);
+
+    // Return the meal plan
+    res.json({ mealPlan });
+  } catch (error) {
+    console.error('Error generating meal plan:', error);
+    res.status(500).json({ error: 'Failed to generate meal plan' });
+  }
+});
+
+
 
 
 // Start the Server
