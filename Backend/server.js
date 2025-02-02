@@ -116,7 +116,7 @@ async function generateMealPlan(userData, recipes) {
 
   // Calculate calorie intake
   const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; // For men
-  const calorieIntake = bmr * activityLevelMultiplier[health_goal];
+  const calorieIntake = bmr * 1.5;
 
   // Call ChatGPT API
   const chatGPTResponse = await axios.post(
