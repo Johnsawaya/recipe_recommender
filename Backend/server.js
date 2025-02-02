@@ -153,6 +153,7 @@ app.post('/meal-plan', async (req, res) => {
   try {
     // Fetch user data from the database
     const userData = await fetchUserData(userId);
+    console.log('User Data:', userData);
     if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -169,7 +170,7 @@ app.post('/meal-plan', async (req, res) => {
     console.error('Error generating meal plan:', error);
     res.status(500).json({ error: 'Failed to generate meal plan' });
   }
-  console.log('User Data:', userData);
+
 
   console.log('ChatGPT Response:', chatGPTResponse.data);
 });
