@@ -136,7 +136,7 @@ async function generateMealPlan(userData, recipes) {
     },
     {
       headers: {
-        'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
+        'Authorization': `Bearer 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`,
       },
     }
   );
