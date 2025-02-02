@@ -163,7 +163,7 @@ async function generateMealPlan(userData, recipes) {
       },
       {
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer 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`,
 
         },
       }
