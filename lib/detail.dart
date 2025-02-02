@@ -12,7 +12,7 @@ class Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: back,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
 
@@ -103,7 +103,7 @@ class Detail extends StatelessWidget {
                         width: 310,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage(recipe.image),
+                            image: AssetImage(recipe.image),
                             fit: BoxFit.fitHeight,
                           ),
                         ),

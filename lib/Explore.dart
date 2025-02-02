@@ -28,7 +28,7 @@ class _ExploreState extends State<Explore> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: back,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -108,7 +108,7 @@ class _ExploreState extends State<Explore> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.blueGrey,
           borderRadius: BorderRadius.all(Radius.circular(20)),
           boxShadow: [kBoxShadow],
         ),
@@ -124,7 +124,7 @@ class _ExploreState extends State<Explore> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(recipe.image),
+                      image:AssetImage(recipe.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -151,7 +151,7 @@ class _ExploreState extends State<Explore> {
       child: Container(
         margin: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.blueGrey,
           borderRadius: BorderRadius.all(Radius.circular(20)),
           boxShadow: [kBoxShadow],
         ),
@@ -162,7 +162,7 @@ class _ExploreState extends State<Explore> {
               width: 160,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(recipe.image),
+                  image: AssetImage(recipe.image),
                   fit: BoxFit.fitHeight,
                 ),
               ),

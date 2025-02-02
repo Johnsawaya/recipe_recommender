@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 Color kPrimaryColor = Color(0xFF275DAE);
-
+Color square=Color(0xF8F4E77D);
+Color back =Color(0xFF123D78);
 BoxShadow kBoxShadow = BoxShadow(
   color: Colors.grey.withOpacity(0.2),
   spreadRadius: 2,

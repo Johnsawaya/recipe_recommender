@@ -44,7 +44,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: back,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -61,10 +61,12 @@ class _LoginState extends State<Login> {
               buildTextSubTitleVariation1("Login to continue"),
               SizedBox(height: 24),
 
-              Text("Email", style: kTextStyle),
+              Text("Email", style: TextStyle(color: Colors.white)),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   hintText: "Enter your email",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -75,11 +77,13 @@ class _LoginState extends State<Login> {
               ),
               SizedBox(height: 16),
 
-              Text("Password", style: kTextStyle),
+              Text("Password", style: TextStyle(color: Colors.white)),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   hintText: "Enter your password",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -112,7 +116,7 @@ class _LoginState extends State<Login> {
                     // Navigate to registration page
                     Navigator.pushNamed(context, '/NewUser');
                   },
-                  child: Text("Don't have an account? Register"),
+                  child: Text("Don't have an account? Register", style: TextStyle(color: Colors.white)),
                 ),
               ),
               SizedBox(height: 24),
