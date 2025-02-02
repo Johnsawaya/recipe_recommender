@@ -167,10 +167,11 @@ app.post('/meal-plan', async (req, res) => {
     console.error('Error generating meal plan:', error);
     res.status(500).json({ error: 'Failed to generate meal plan' });
   }
+  console.log('User Data:', userData);
+  console.log('Recipes:', recipes);
+  console.log('ChatGPT Response:', chatGPTResponse.data);
 });
-console.log('User Data:', userData);
-console.log('Recipes:', recipes);
-console.log('ChatGPT Response:', chatGPTResponse.data);
+
 
 
 
