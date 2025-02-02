@@ -112,7 +112,31 @@ async function fetchRecipesFromDatabase() {
   return result.rows;
 }
 
-// Generate meal plan using ChatGPT
+
+
+
+// Helper function to implement exponential backoff
+async function retryRequest(fn, retries = 5, delay = 1000) {
+  try {
+    return await fn(); // Try the API request
+  } catch (err) {
+    if (retries <= 0) {
+      throw err; // If no retries left, throw error
+    }
+
+    if (err.response && err.response.status === 429) {
+      // If rate limit is exceeded (status code 429), retry with exponential backoff
+      console.log(`Rate limit exceeded, retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return retryRequest(fn, retries - 1, delay * 2); // Double the delay for each retry
+    } else {
+      throw err; // Throw other errors immediately
+    }
+  }
+}
+
+
+// Generate meal plan using ChatGPT with retry logic
 async function generateMealPlan(userData, recipes) {
   const { age, height, weight, health_goal } = userData;
 
@@ -120,31 +144,43 @@ async function generateMealPlan(userData, recipes) {
   const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; // For men
   const calorieIntake = bmr * 1.5;
 
-  // Call ChatGPT API
-  const chatGPTResponse = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
-    {
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a nutritionist and meal planner.',
-        },
-        {
-          role: 'user',
-          content: `Create a meal plan for a user with the following data: Age: ${age}, Height: ${height}, Weight: ${weight}, Health Goal: ${health_goal}, Daily Calorie Intake: ${calorieIntake}. Recipes: ${JSON.stringify(recipes)}`,
-        },
-      ],
-    },
-    {
-      headers: {
-        'Authorization': `Bearer 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`,
+  // Prepare API call
+  const apiCall = async () => {
+    return axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a nutritionist and meal planner.',
+          },
+          {
+            role: 'user',
+            content: `Create a meal plan for a user with the following data: Age: ${age}, Height: ${height}, Weight: ${weight}, Health Goal: ${health_goal}, Daily Calorie Intake: ${calorieIntake}. Recipes: ${JSON.stringify(recipes)}`,
+          },
+        ],
       },
-    }
-  );
+      {
+        headers: {
+          'Authorization': `Bearer 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`,
 
-  return chatGPTResponse.data.choices[0].message.content;
+        },
+      }
+    );
+  };
+
+  try {
+    // Retry the API call if rate limit errors occur
+    const chatGPTResponse = await retryRequest(apiCall);
+    return chatGPTResponse.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error generating meal plan:', error);
+    throw new Error('Failed to generate meal plan');
+  }
 }
+
+
 
 // API endpoint to generate meal plan
 app.post('/meal-plan', async (req, res) => {
