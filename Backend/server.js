@@ -167,6 +167,49 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
 
 
 
+app.post("/api/favorites", async (req, res) => {
+  const { userId, recipeId } = req.body;
+
+  if (!userId || !recipeId) {
+    return res.status(400).json({ message: "User ID and Recipe ID are required." });
+  }
+
+  try {
+    // Insert the favorite recipe into the user_recipes table
+    await pool.query(
+      "INSERT INTO user_recipes (user_id, recipe_id) VALUES ($1, $2)",
+      [userId, recipeId]
+    );
+
+    res.status(200).json({ message: "Recipe added to favorites" });
+  } catch (err) {
+    console.error("Error saving favorite:", err.message);
+    res.status(500).json({ message: "Failed to add favorite", error: err.message });
+  }
+});
+
+app.get("/api/favorites/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Query to get the favorite recipes of the user
+    const result = await pool.query(
+      `SELECT r.* FROM recipes r
+       JOIN user_recipes ur ON r.id = ur.recipe_id
+       WHERE ur.user_id = $1`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No favorites found" });
+    }
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching favorites:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 
 
