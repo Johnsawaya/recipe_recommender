@@ -5,6 +5,9 @@ import 'Favorites.dart';
 import 'Profile.dart';
 import 'Design.dart';
 class HomeScreen extends StatefulWidget {
+  final String username;
+  HomeScreen({required this.username});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -12,12 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    Home(),
-    Explore(), // Browse all recipes
-    Favorites(), // Saved recipes
-    Profile(), // User info
-  ];
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -27,6 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _pages = [
+      Home(username:widget.username ),
+      Explore(), // Browse all recipes
+      Favorites(), // Saved recipes
+      Profile(), // User info
+    ];
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

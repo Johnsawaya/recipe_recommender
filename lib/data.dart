@@ -8,7 +8,14 @@ class Recipe {
   int prepTime;
   String Ingredients;
   String steps;
-  Recipe(this.title, this.description, this.image, this.calories,  this.protein,this.prepTime,this.Ingredients,this.steps);
+  Recipe(this.title,
+      this.description,
+      this.image,
+      this.calories,
+      this.protein,
+      this.prepTime,
+      this.Ingredients,
+      this.steps);
 
 }
 

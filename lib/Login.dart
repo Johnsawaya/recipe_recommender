@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'services/api_service.dart'; // Import the API service
 import 'Design.dart';
 import 'HomeScreen.dart';
-import 'Login.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
@@ -25,11 +25,12 @@ class _LoginState extends State<Login> {
 
     try {
       final response = await ApiService.login(_usernameController.text, _passwordController.text);
+      final username = _usernameController.text;
       print("Login successful: $response");
 
       // Navigate to home page or show success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Login Successful")));
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()),); // Ensure you have a '/home' route defined
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(username: username)),); // Ensure you have a '/home' route defined
 
     } catch (e) {
       print("Error: $e");

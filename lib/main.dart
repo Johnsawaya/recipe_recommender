@@ -24,7 +24,7 @@ debugShowCheckedModeBanner: false,
      // Login page route
     '/NewUser': (context) => NewUser(), // New user registration route
      // Home page route
-    '/HomeScreen':(context)=>HomeScreen(),
+    //'/HomeScreen':(context)=>HomeScreen(),
   },
 home: Login(),
 );

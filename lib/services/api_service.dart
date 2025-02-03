@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:recipe_recommender/data.dart';
 
+
+
+
+
 class ApiService {
   static const String baseUrl = "https://recipe-recommender-backend-hfxt.onrender.com";
 
@@ -21,7 +25,17 @@ class ApiService {
   }
 
   // Fetch User Info
+// Fetch user info by userId
+  static Future<User> getUserInfo(String username) async {
+    final response = await http.get(Uri.parse("$baseUrl/api/user/$username"));
 
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      return User.fromJson(jsonData);
+    } else {
+      throw Exception("Failed to fetch user info");
+    }
+  }
   // Register user (post to the backend)
   static Future<String> registerUser(
       String username,
@@ -90,7 +104,72 @@ class ApiService {
     }
   }
 
+// Fetch Recommended Recipes
+  static Future<List<Recipe>> fetchRecommendedRecipes(String userId) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/api/recommended-recipes/$userId"));
+      print("API Response Status Code: ${response.statusCode}");
 
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = jsonDecode(response.body);
+        print("Decoded Recommended Recipes JSON: $jsonData");
 
+        List<Recipe> recommendedRecipes = jsonData.map((data) {
+          return Recipe(
+            data['title'] ?? '',
+            data['description'] ?? '',
+            data['image_url'] ?? '',
+            data['calories'] ?? 0,
+            data['protein'] ?? 0,
+            data['prep_time'] ?? 0,
+            data['ingredients']?.join(", ") ?? '',
+            data['steps']?.join("\n") ?? '',
+          );
+        }).toList();
 
+        return recommendedRecipes;
+      } else {
+        throw Exception("Failed to fetch recommended recipes, Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching recommended recipes: $e");
+      return [];
+    }
+  }
 }
+
+class User {
+  final String auth_id;
+
+  final String name;
+  final String dietaryPreferences;
+  final String healthGoal;
+  final int age;
+  final double height;
+  final int weight;
+
+  User({
+    required this.auth_id,
+
+    required this.name,
+    required this.dietaryPreferences,
+    required this.healthGoal,
+    required this.age,
+    required this.height,
+    required this.weight,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      auth_id: json['auth_id'].toString(),
+
+      name: json['name'] ?? '',
+      dietaryPreferences: json['dietary_preferences'] ?? '',
+      healthGoal: json['health_goal'] ?? '',
+      age: json['age'] ?? 0,
+      height: (json['height'] ?? 0).toDouble(),
+      weight: json['weight'] ?? 0,
+    );
+  }
+}
+
