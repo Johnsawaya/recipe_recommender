@@ -67,7 +67,7 @@ class _LoginState extends State<Login> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  hintText: "Enter your email",
+                  hintText: "Enter your UserName",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
