@@ -51,25 +51,39 @@ app.post("/login", async (req, res) => {
 // get user info
 
 
-app.get("/api/user/:userId", async (req, res) => {
-  const { userId } = req.params;
+app.get("/api/user/:username", async (req, res) => {
+  const { username } = req.params;
 
   try {
-    const result = await pool.query(
-      "SELECT auth_id, name, dietary_preferences, health_goal, age, height, weight FROM users WHERE auth_id = $1",
-      [userId]
+    // Step 1: Get auth_id from auth_users table
+    const authResult = await pool.query(
+      "SELECT id FROM auth_users WHERE username = $1",
+      [username]
     );
 
-    if (result.rows.length === 0) {
+    if (authResult.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(result.rows[0]);
+    const authId = authResult.rows[0].id;
+
+    // Step 2: Get user info from users table using auth_id
+    const userResult = await pool.query(
+      "SELECT auth_id, name, dietary_preferences, health_goal, age, height, weight FROM users WHERE auth_id = $1",
+      [authId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User details not found" });
+    }
+
+    res.status(200).json(userResult.rows[0]);
   } catch (err) {
     console.error("Error fetching user info:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
 
 // Registration Route
 app.post("/api/register", async (req, res) => {
