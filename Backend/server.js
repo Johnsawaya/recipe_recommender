@@ -56,7 +56,7 @@ app.post("/api/register", async (req, res) => {
   try {
     const authResult = await pool.query(
       "INSERT INTO auth_users (username, password) VALUES ($1, $2) RETURNING id",
-      [email, password]
+      [username, password]
     );
     const authUserId = authResult.rows[0].id;
 
