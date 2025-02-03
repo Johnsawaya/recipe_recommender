@@ -76,7 +76,7 @@ app.post("/api/register", async (req, res) => {
 app.get("/api/recipes", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM recipes");
-    console.log("Fetched Recipes:", result.rows);  // Log the fetched recipes
+
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching recipes:", err.message);
