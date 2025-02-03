@@ -154,7 +154,7 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
       validRecipes = await getValidRecipes();
     }
 
-    console.log("Recommended Recipes:", validRecipes);
+
     res.status(200).json(validRecipes);
   } catch (err) {
     console.error("Error fetching recommended recipes:", err.message);
