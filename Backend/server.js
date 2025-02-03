@@ -137,7 +137,7 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
       );
 
       const totalCalories = recipeResult.rows.reduce((sum, recipe) => sum + parseFloat(recipe.calories), 0);
-      console.log("Total Calories of Selected Recipes:", totalCalories);
+
 
       // If the sum of calories is within the range, return the recipes
       if (totalCalories >= minCalories && totalCalories <= maxCalories) {
