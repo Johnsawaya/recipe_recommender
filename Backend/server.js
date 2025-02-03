@@ -19,9 +19,9 @@ app.get("/", async (req, res) => {
 
 // Login Route
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  if (!email || !password) {
+  if (!username || !password) {
     return res.status(400).json({ message: "username and password are required." });
   }
 
