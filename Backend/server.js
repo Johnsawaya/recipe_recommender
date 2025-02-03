@@ -115,8 +115,8 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
     }
 
     const { age, height, weight, health_goal } = userResult.rows[0];
+    const targetCalories = calculateCalories(parseInt(age), parseFloat(height), parseFloat(weight), health_goal);
 
-    const targetCalories = calculateCalories(age, height, weight, health_goal);
     const minCalories = targetCalories * 0.9;
     const maxCalories = targetCalories * 1.1;
 
