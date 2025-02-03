@@ -1,9 +1,7 @@
-
 require("dotenv").config();
-const axios = require('axios');
 const express = require("express");
 const cors = require("cors");
-const { pool } = require("./db");  // Import pool from db.js
+const { pool } = require("./db"); // Import pool from db.js
 
 const app = express();
 app.use(cors());
@@ -12,7 +10,7 @@ app.use(express.json());
 // Example Route for Database Test
 app.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT NOW()");  // Example query to get the current time
+    const result = await pool.query("SELECT NOW()");
     res.json({ message: "Connected to PostgreSQL", time: result.rows[0].now });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -28,25 +26,21 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    // Query the auth_users table to find the user by email
-    const result = await pool.query('SELECT * FROM auth_users WHERE email = $1', [email]);
+    const result = await pool.query("SELECT * FROM auth_users WHERE email = $1", [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Compare the entered password with the one stored in the database (plain text comparison)
     const storedPassword = result.rows[0].password;
 
     if (storedPassword === password) {
-      // Passwords match, return user info and success message
       return res.status(200).json({
         message: "Login successful",
-        user: result.rows[0], // Include user info from auth_users table
-        userId: userId, // Include the user ID
+        user: result.rows[0], // User info
+        userId: result.rows[0].id, // Corrected user ID retrieval
       });
     } else {
-      // Passwords don't match
       return res.status(401).json({ message: "Invalid password" });
     }
   } catch (err) {
@@ -55,22 +49,20 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// REGISTrTION
-app.post('/api/register', async (req, res) => {
-  const { email, password, name, dietary_preferences, health_goal, age, height, daily_calories } = req.body;
+// Registration Route
+app.post("/api/register", async (req, res) => {
+  const { email, password, name, dietary_preferences, health_goal, age, height, weight } = req.body;
 
   try {
-    // Insert into the auth_users table (credentials)
     const authResult = await pool.query(
-      'INSERT INTO auth_users (email, password) VALUES ($1, $2) RETURNING id',
+      "INSERT INTO auth_users (email, password) VALUES ($1, $2) RETURNING id",
       [email, password]
     );
     const authUserId = authResult.rows[0].id;
 
-    // Insert into the users table (personal info)
     await pool.query(
-      'INSERT INTO users (auth_id, name, dietary_preferences, health_goal, age, height, daily_calories) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-      [authUserId, name, dietary_preferences, health_goal, age, height, daily_calories]
+      "INSERT INTO users (auth_id, name, dietary_preferences, health_goal, age, height, weight) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [authUserId, name, dietary_preferences, health_goal, age, height, weight]
     );
 
     res.status(200).send("User registered successfully");
@@ -80,14 +72,10 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-
-
-// Fetch Recipes
+// Fetch All Recipes
 app.get("/api/recipes", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM recipes"
-    );
+    const result = await pool.query("SELECT * FROM recipes");
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching recipes:", err.message);
@@ -95,121 +83,69 @@ app.get("/api/recipes", async (req, res) => {
   }
 });
 
+// Function to Calculate Daily Calorie Needs (Mifflin-St Jeor)
+function calculateCalories(age, height, weight, health_goal) {
+  let BMR = 10 * weight + 6.25 * height - 5 * age + 5; // Assuming male
+  let TDEE = BMR * 1.55; // Moderate activity factor
 
-
-
-// Fetch user data from the database
-async function fetchUserData(userId) {
-  const query = 'SELECT age, height, weight, health_goal FROM users WHERE auth_id = $1';
-  const result = await pool.query(query, [userId]);
-  return result.rows[0];
-}
-
-// Fetch recipes from the database
-async function fetchRecipesFromDatabase() {
-  const query = 'SELECT title, calories, protein, ingredients, steps FROM recipes';
-  const result = await pool.query(query);
-  return result.rows;
-}
-
-
-
-
-// Helper function to implement exponential backoff
-async function retryRequest(fn, retries = 5, delay = 1000) {
-  try {
-    return await fn(); // Try the API request
-  } catch (err) {
-    if (retries <= 0) {
-      throw err; // If no retries left, throw error
-    }
-
-    if (err.response && err.response.status === 429) {
-      // If rate limit is exceeded (status code 429), retry with exponential backoff
-      console.log(`Rate limit exceeded, retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return retryRequest(fn, retries - 1, delay * 2); // Double the delay for each retry
-    } else {
-      throw err; // Throw other errors immediately
-    }
+  let targetCalories;
+  if (health_goal === "weight loss") {
+    targetCalories = TDEE - 500;
+  } else if (health_goal === "weight gain") {
+    targetCalories = TDEE + 500;
+  } else {
+    targetCalories = TDEE;
   }
+
+  return targetCalories;
 }
 
+// Fetch Recommended Recipes Based on User's Goal
+app.get("/api/recommended-recipes/:userId", async (req, res) => {
+  const { userId } = req.params;
 
-// Generate meal plan using ChatGPT with retry logic
-async function generateMealPlan(userData, recipes) {
-  const { age, height, weight, health_goal } = userData;
-
-  // Calculate calorie intake
-  const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; // For men
-  const calorieIntake = bmr * 1.5;
-
-  // Prepare API call
-  const apiCall = async () => {
-    return axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a nutritionist and meal planner.',
-          },
-          {
-            role: 'user',
-            content: `Create a meal plan for a user with the following data: Age: ${age}, Height: ${height}, Weight: ${weight}, Health Goal: ${health_goal}, Daily Calorie Intake: ${calorieIntake}. Recipes: ${JSON.stringify(recipes)}`,
-          },
-        ],
-      },
-      {
-        headers: {
-          'Authorization': `Bearer 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`,
-
-        },
-      }
+  try {
+    const userResult = await pool.query(
+      "SELECT age, height, weight, health_goal FROM users WHERE auth_id = $1",
+      [userId]
     );
-  };
 
-  try {
-    // Retry the API call if rate limit errors occur
-    const chatGPTResponse = await retryRequest(apiCall);
-    return chatGPTResponse.data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error generating meal plan:', error);
-    throw new Error('Failed to generate meal plan');
-  }
-}
-
-
-
-// API endpoint to generate meal plan
-app.post('/meal-plan', async (req, res) => {
-  const { userId } = req.body;
-
-  try {
-    // Fetch user data from the database
-    const userData = await fetchUserData(userId);
-    console.log('User Data:', userData);
-    if (!userData) {
-      return res.status(404).json({ error: 'User not found' });
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch recipes from the database
-    const recipes = await fetchRecipesFromDatabase();
+    const { age, height, weight, health_goal } = userResult.rows[0];
 
-    // Generate meal plan using ChatGPT
-    const mealPlan = await generateMealPlan(userData, recipes);
+    const targetCalories = calculateCalories(age, height, weight, health_goal);
+    const minCalories = targetCalories * 0.9;
+    const maxCalories = targetCalories * 1.1;
 
-    // Return the meal plan
-    res.json({ mealPlan });
-  } catch (error) {
-    console.error('Error generating meal plan:', error);
-    res.status(500).json({ error: 'Failed to generate meal plan' });
+    const recipeResult = await pool.query(
+      `SELECT * FROM recipes
+       WHERE calories BETWEEN $1 AND $2
+       ORDER BY RANDOM()
+       LIMIT 5`,
+      [minCalories, maxCalories]
+    );
+
+    res.status(200).json(recipeResult.rows);
+  } catch (err) {
+    console.error("Error fetching recommended recipes:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
-
-
-  console.log('ChatGPT Response:', chatGPTResponse.data);
 });
+
+// Start the Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+
+
+
+
 
 
 
