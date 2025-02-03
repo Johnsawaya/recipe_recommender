@@ -9,12 +9,12 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> loginUser() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill in all fields")));
       return;
     }
@@ -24,7 +24,7 @@ class _LoginState extends State<Login> {
     });
 
     try {
-      final response = await ApiService.login(_emailController.text, _passwordController.text);
+      final response = await ApiService.login(_usernameController.text, _passwordController.text);
       print("Login successful: $response");
 
       // Navigate to home page or show success message
@@ -61,9 +61,9 @@ class _LoginState extends State<Login> {
               buildTextSubTitleVariation1("Login to continue"),
               SizedBox(height: 24),
 
-              Text("Email", style: TextStyle(color: Colors.white)),
+              Text("UserName", style: TextStyle(color: Colors.white)),
               TextField(
-                controller: _emailController,
+                controller: _usernameController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,

@@ -6,11 +6,11 @@ class ApiService {
   static const String baseUrl = "https://recipe-recommender-backend-hfxt.onrender.com";
 
   // User Authentication
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await http.post(
       Uri.parse("$baseUrl/login"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "password": password}),
+      body: jsonEncode({"username": username, "password": password}),
     );
 
     if (response.statusCode == 200) {
@@ -24,25 +24,25 @@ class ApiService {
 
   // Register user (post to the backend)
   static Future<String> registerUser(
-      String email,
+      String username,
       String password,
       String name,
       String dietPreference,
       String healthGoal,
       int age,
       double height,
-      int dailyCalories) async {
+      int weight) async {
     final response = await http.post(
       Uri.parse("$baseUrl/api/register"),
       body: json.encode({
-        'email': email,
+        'username': username,
         'password': password,
         'name': name,
         'dietary_preferences': dietPreference,
         'health_goal': healthGoal,
         'age': age,
         'height': height,
-        'daily_calories': dailyCalories,
+        'weight': weight,
       }),
       headers: {"Content-Type": "application/json"},
     );
