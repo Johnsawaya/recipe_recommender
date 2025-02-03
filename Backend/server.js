@@ -22,11 +22,11 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required." });
+    return res.status(400).json({ message: "username and password are required." });
   }
 
   try {
-    const result = await pool.query("SELECT * FROM auth_users WHERE email = $1", [email]);
+    const result = await pool.query("SELECT * FROM auth_users WHERE username = $1", [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -51,11 +51,11 @@ app.post("/login", async (req, res) => {
 
 // Registration Route
 app.post("/api/register", async (req, res) => {
-  const { email, password, name, dietary_preferences, health_goal, age, height, weight } = req.body;
+  const { username, password, name, dietary_preferences, health_goal, age, height, weight } = req.body;
 
   try {
     const authResult = await pool.query(
-      "INSERT INTO auth_users (email, password) VALUES ($1, $2) RETURNING id",
+      "INSERT INTO auth_users (username, password) VALUES ($1, $2) RETURNING id",
       [email, password]
     );
     const authUserId = authResult.rows[0].id;
@@ -90,9 +90,9 @@ function calculateCalories(age, height, weight, health_goal) {
   let TDEE = BMR * 1.55; // Moderate activity factor
 
   let targetCalories;
-  if (health_goal === "weight loss") {
+  if (health_goal === "Weight Loss") {
     targetCalories = TDEE - 500;
-  } else if (health_goal === "weight gain") {
+  } else if (health_goal === "Muscle Gain") {
     targetCalories = TDEE + 500;
   } else {
     targetCalories = TDEE;
