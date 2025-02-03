@@ -48,6 +48,28 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+// get user info
+
+
+app.get("/api/user/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT auth_id, name, dietary_preferences, health_goal, age, height, weight FROM users WHERE auth_id = $1",
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error fetching user info:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 // Registration Route
 app.post("/api/register", async (req, res) => {
