@@ -105,7 +105,6 @@ function calculateCalories(age, height, weight, health_goal) {
 // Fetch Recommended Recipes Based on User's Goal
 app.get("/api/recommended-recipes/:userId", async (req, res) => {
   const { userId } = req.params;
-  console.log("Received userId:", userId);  // Log the received userId
 
   try {
     const userResult = await pool.query(
@@ -114,37 +113,49 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
-      console.log("User not found for userId:", userId);  // Log if user is not found
       return res.status(404).json({ message: "User not found" });
     }
 
     const { age, height, weight, health_goal } = userResult.rows[0];
-    console.log("User Data:", { age, height, weight, health_goal });  // Log the user data
 
+    // Calculate target calories (for goal personalization)
     const targetCalories = calculateCalories(parseInt(age), parseFloat(height), parseFloat(weight), health_goal);
+    console.log("Target Calories:", targetCalories);
 
+    // Calculate min and max calorie range
     const minCalories = targetCalories * 0.9;
     const maxCalories = targetCalories * 1.1;
+    console.log("Min Calories:", minCalories);
+    console.log("Max Calories:", maxCalories);
 
-    console.log("Min Calories:", minCalories);  // Log min calories
-    console.log("Max Calories:", maxCalories);  // Log max calories
+    // Function to fetch and check the sum of random recipes
+    const getValidRecipes = async () => {
+      const recipeResult = await pool.query(
+        `SELECT * FROM recipes
+         ORDER BY RANDOM()
+         LIMIT 5`
+      );
 
-    const recipeResult = await pool.query(
-      `SELECT * FROM recipes
-       WHERE calories BETWEEN $1 AND $2
-       ORDER BY RANDOM()
-       LIMIT 5`,
-      [minCalories, maxCalories]
-    );
+      const totalCalories = recipeResult.rows.reduce((sum, recipe) => sum + parseFloat(recipe.calories), 0);
+      console.log("Total Calories of Selected Recipes:", totalCalories);
 
-    console.log("Recommended Recipes:", recipeResult.rows);  // Log the fetched recipes based on calorie range
+      // If the sum of calories is within the range, return the recipes
+      if (totalCalories >= minCalories && totalCalories <= maxCalories) {
+        return recipeResult.rows;
+      }
 
-    if (recipeResult.rows.length === 0) {
-      console.log("No recipes found in the calorie range.");  // Log if no recipes are found
-      return res.status(404).json({ message: "No recommended recipes found" });
+      // If not, try fetching a new set of 5 recipes
+      return null;
+    };
+
+    // Attempt to get valid recipes
+    let validRecipes = null;
+    while (!validRecipes) {
+      validRecipes = await getValidRecipes();
     }
 
-    res.status(200).json(recipeResult.rows);  // Send the result
+    console.log("Recommended Recipes:", validRecipes);
+    res.status(200).json(validRecipes);
   } catch (err) {
     console.error("Error fetching recommended recipes:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
