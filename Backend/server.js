@@ -76,6 +76,7 @@ app.post("/api/register", async (req, res) => {
 app.get("/api/recipes", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM recipes");
+    console.log("Fetched Recipes:", result.rows);  // Log the fetched recipes
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching recipes:", err.message);
@@ -97,12 +98,14 @@ function calculateCalories(age, height, weight, health_goal) {
     targetCalories = TDEE;
   }
 
+  console.log("Target Calories:", targetCalories);  // Log the calculated target calories
   return targetCalories;
 }
 
 // Fetch Recommended Recipes Based on User's Goal
 app.get("/api/recommended-recipes/:userId", async (req, res) => {
   const { userId } = req.params;
+  console.log("Received userId:", userId);  // Log the received userId
 
   try {
     const userResult = await pool.query(
@@ -111,14 +114,20 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
+      console.log("User not found for userId:", userId);  // Log if user is not found
       return res.status(404).json({ message: "User not found" });
     }
 
     const { age, height, weight, health_goal } = userResult.rows[0];
+    console.log("User Data:", { age, height, weight, health_goal });  // Log the user data
+
     const targetCalories = calculateCalories(parseInt(age), parseFloat(height), parseFloat(weight), health_goal);
 
     const minCalories = targetCalories * 0.9;
     const maxCalories = targetCalories * 1.1;
+
+    console.log("Min Calories:", minCalories);  // Log min calories
+    console.log("Max Calories:", maxCalories);  // Log max calories
 
     const recipeResult = await pool.query(
       `SELECT * FROM recipes
@@ -128,12 +137,20 @@ app.get("/api/recommended-recipes/:userId", async (req, res) => {
       [minCalories, maxCalories]
     );
 
-    res.status(200).json(recipeResult.rows);
+    console.log("Recommended Recipes:", recipeResult.rows);  // Log the fetched recipes based on calorie range
+
+    if (recipeResult.rows.length === 0) {
+      console.log("No recipes found in the calorie range.");  // Log if no recipes are found
+      return res.status(404).json({ message: "No recommended recipes found" });
+    }
+
+    res.status(200).json(recipeResult.rows);  // Send the result
   } catch (err) {
     console.error("Error fetching recommended recipes:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
 
 
 
