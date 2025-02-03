@@ -26,7 +26,7 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    const result = await pool.query("SELECT * FROM auth_users WHERE username = $1", [email]);
+    const result = await pool.query("SELECT * FROM auth_users WHERE username = $1", [username]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
