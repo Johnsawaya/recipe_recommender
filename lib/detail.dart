@@ -103,7 +103,7 @@ class Detail extends StatelessWidget {
                         width: 310,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage(recipe.image),
+                            image: NetworkImage(recipe.image),
                             fit: BoxFit.fitHeight,
                           ),
                         ),

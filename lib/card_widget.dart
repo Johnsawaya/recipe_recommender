@@ -50,6 +50,7 @@ class card_widget extends StatelessWidget {
               child: Text(
                 title,
                 style: TextStyle(
+                  color:Colors.white,
                   fontSize: 19,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -78,7 +79,8 @@ class card_widget extends StatelessWidget {
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text(calories),
+                      Text(calories,style:TextStyle(
+                          color:Colors.white)),
                     ],
                   ),
                 ),
@@ -97,7 +99,8 @@ class card_widget extends StatelessWidget {
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text(prep_time),
+                      Text(prep_time,style:TextStyle(
+                        color:Colors.white)),
                     ],
                   ),
                 )

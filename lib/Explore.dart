@@ -124,7 +124,7 @@ class _ExploreState extends State<Explore> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image:AssetImage(recipe.image),
+                      image:NetworkImage(recipe.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -162,7 +162,7 @@ class _ExploreState extends State<Explore> {
               width: 160,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(recipe.image),
+                  image: NetworkImage(recipe.image),
                   fit: BoxFit.fitHeight,
                 ),
               ),
