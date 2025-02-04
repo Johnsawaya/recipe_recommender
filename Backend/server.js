@@ -267,30 +267,6 @@ app.delete("/api/favorites/:userId/:recipeId", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
-app.get("/api/favorites/:userId", async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    // Query to get favorite recipes of the user
-    const result = await pool.query(
-      `SELECT r.* FROM recipes r
-       JOIN user_recipes ur ON r.id = ur.recipe_id
-       WHERE ur.user_id = $1`,
-      [userId]
-    );
-
-    // Check if user has any favorite recipes
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No favorites found" });
-    }
-
-    // Return favorite recipes
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error("Error fetching favorites:", err.message);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
 
 
 
