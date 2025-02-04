@@ -246,6 +246,27 @@ app.get("/api/favorites/:userId", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+// delete fav
+app.delete("/api/favorites/:userId/:recipeId", async (req, res) => {
+  const { userId, recipeId } = req.params;
+
+  try {
+    // Delete the favorite if it exists
+    const result = await pool.query(
+      `DELETE FROM user_recipes WHERE user_id = $1 AND recipe_id = $2 RETURNING *`,
+      [userId, recipeId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Favorite not found" });
+    }
+
+    res.status(200).json({ message: "Favorite removed successfully" });
+  } catch (err) {
+    console.error("Error removing favorite:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 
 
