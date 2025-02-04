@@ -6,6 +6,7 @@ class card_widget extends StatelessWidget {
   final String protein;
   final String prep_time;
   final String image_url;
+
   card_widget({
     required this.title,
     required this.calories,
@@ -13,6 +14,7 @@ class card_widget extends StatelessWidget {
     required this.prep_time,
     required this.image_url,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,7 +40,7 @@ class card_widget extends StatelessWidget {
             Colors.black.withOpacity(0.35),
             BlendMode.multiply,
           ),
-          image: NetworkImage(image_url),
+          image: _getImageProvider(image_url), // Use our custom image provider
           fit: BoxFit.cover,
         ),
       ),
@@ -50,7 +52,7 @@ class card_widget extends StatelessWidget {
               child: Text(
                 title,
                 style: TextStyle(
-                  color:Colors.white,
+                  color: Colors.white,
                   fontSize: 19,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -73,14 +75,8 @@ class card_widget extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.favorite_border,
-                        color: Colors.yellow,
-                        size: 18,
-                      ),
                       SizedBox(width: 7),
-                      Text(calories,style:TextStyle(
-                          color:Colors.white)),
+                      Text(calories, style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 ),
@@ -99,8 +95,7 @@ class card_widget extends StatelessWidget {
                         size: 18,
                       ),
                       SizedBox(width: 7),
-                      Text(prep_time,style:TextStyle(
-                        color:Colors.white)),
+                      Text(prep_time, style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 )
@@ -111,5 +106,14 @@ class card_widget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Function to check whether the image source is from the network or assets
+  ImageProvider<Object> _getImageProvider(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return NetworkImage(path);  // For URLs
+    } else {
+      return AssetImage(path);  // For local assets
+    }
   }
 }

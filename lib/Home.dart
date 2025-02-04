@@ -17,6 +17,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   User? _user;
   bool _isLoading = true;
   String _errorMessage = '';
@@ -35,6 +36,7 @@ class _HomeState extends State<Home> {
       setState(() {
         _user = userData;
         _isLoading = false;
+
       });
     } catch (error) {
       setState(() {
@@ -172,7 +174,7 @@ class _HomeState extends State<Home> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Detail(recipe: recipe),
+                              builder: (context) => Detail(recipe: recipe,userId:_user!.auth_id ,),
                             ),
                           );
                         },

@@ -1,5 +1,5 @@
 class Recipe {
-
+  int id;
   String title;
   String description;
   String image;
@@ -8,7 +8,8 @@ class Recipe {
   int prepTime;
   String Ingredients;
   String steps;
-  Recipe(this.title,
+  Recipe(this.id,
+      this.title,
       this.description,
       this.image,
       this.calories,

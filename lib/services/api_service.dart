@@ -83,6 +83,7 @@ class ApiService {
         // Map the decoded data to a list of Recipe objects
         List<Recipe> recipes = jsonData.map((data) {
           return Recipe(
+            data['id']??0,
             data['title'] ?? '',          // Handle null values
             data['description'] ?? '',
             data['image_url'] ?? '',      // Use 'image_url' based on the response format
@@ -104,8 +105,83 @@ class ApiService {
     }
   }
 
+
+
+  // Check if recipe is in favorites
+  static Future<bool> isFavorite(int userId, int recipeId) async {
+    final response = await http.get(Uri.parse("$baseUrl/api/favorites/$userId"));
+
+    if (response.statusCode == 200) {
+      List<dynamic> favorites = jsonDecode(response.body);
+      return favorites.any((recipe) => recipe['id'] == recipeId);
+    } else {
+      print("Failed to fetch favorites: ${response.body}");
+      return false;
+    }
+  }
+// Fetch all favorite recipes for a user
+  static Future<List<Recipe>> fetchFavorites(int userId) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/api/favorites/$userId"));
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = jsonDecode(response.body);
+
+        // Convert JSON data to a list of Recipe objects
+        List<Recipe> favorites = jsonData.map((data) {
+          return Recipe(
+            data['id'] ?? 0,
+            data['title'] ?? '',
+            data['description'] ?? '',
+            data['image_url'] ?? '',
+            data['calories'] ?? 0,
+            data['protein'] ?? 0,
+            data['prep_time'] ?? 0,
+
+            data['ingredients']?.join(", ") ?? '',
+            data['steps']?.join("\n") ?? '',
+          );
+        }).toList();
+
+        return favorites;
+      } else {
+        print("Failed to fetch favorites: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching favorites: $e");
+      return [];
+    }
+  }
+  // Toggle favorite (Add/Remove)
+  static Future<bool> toggleFavorite(int userId, int recipeId, bool isFavorite) async {
+    final String url = "$baseUrl/api/favorites/$userId/$recipeId";
+
+    try {
+      final response = isFavorite
+          ? await http.delete(Uri.parse(url)) // Remove from favorites
+          : await http.post(                  // Add to favorites
+        Uri.parse("$baseUrl/api/favorites"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"userId": userId, "recipeId": recipeId}),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Success
+      } else {
+        print("Failed to toggle favorite: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error toggling favorite: $e");
+      return false;
+    }
+  }
+
+
+
 // Fetch Recommended Recipes
-  static Future<List<Recipe>> fetchRecommendedRecipes(String userId) async {
+  static Future<List<Recipe>> fetchRecommendedRecipes(int userId) async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/api/recommended-recipes/$userId"));
       print("API Response Status Code: ${response.statusCode}");
@@ -116,6 +192,7 @@ class ApiService {
 
         List<Recipe> recommendedRecipes = jsonData.map((data) {
           return Recipe(
+            data['id']?? 0,
             data['title'] ?? '',
             data['description'] ?? '',
             data['image_url'] ?? '',
@@ -139,7 +216,7 @@ class ApiService {
 }
 
 class User {
-  final String auth_id;
+  final int auth_id;
 
   final String name;
   final String dietaryPreferences;
@@ -161,7 +238,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      auth_id: json['auth_id'].toString(),
+      auth_id: json['auth_id']??0,
 
       name: json['name'] ?? '',
       dietaryPreferences: json['dietary_preferences'] ?? '',

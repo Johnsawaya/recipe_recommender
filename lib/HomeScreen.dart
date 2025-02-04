@@ -27,9 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<Widget> _pages = [
       Home(username:widget.username ),
-      Explore(), // Browse all recipes
-      Favorites(), // Saved recipes
-      Profile(), // User info
+      Explore(username:widget.username), // Browse all recipes
+      Favorites(username:widget.username), // Saved recipes
+      Profile(username: widget.username), // User info
     ];
     return Scaffold(
       body: _pages[_selectedIndex],

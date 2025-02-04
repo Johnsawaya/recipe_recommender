@@ -5,17 +5,23 @@ import 'data.dart';
 import 'services/api_service.dart';
 
 class Explore extends StatefulWidget {
+  final String username;
+  Explore({required this.username});
   @override
   _ExploreState createState() => _ExploreState();
 }
 
 class _ExploreState extends State<Explore> {
   List<Recipe> recipes = [];
+  User? _user;
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
     fetchRecipes();
+    _fetchUserInfo();
   }
 
   void fetchRecipes() async {
@@ -25,6 +31,30 @@ class _ExploreState extends State<Explore> {
     });
   }
 
+  Future<void> _fetchUserInfo() async {
+    try {
+      User userData = await ApiService.getUserInfo(widget.username);
+      setState(() {
+        _user = userData;
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _errorMessage = "Failed to load user info";
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Function to check whether the image source is from the network or assets
+  ImageProvider<Object> _getImageProvider(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return NetworkImage(path);  // For URLs
+    } else {
+      return AssetImage(path);  // For local assets
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +62,6 @@ class _ExploreState extends State<Explore> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16),
@@ -103,7 +132,7 @@ class _ExploreState extends State<Explore> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Detail(recipe: recipe)),
+          MaterialPageRoute(builder: (context) => Detail(recipe: recipe, userId: _user!.auth_id)),
         );
       },
       child: Container(
@@ -124,7 +153,7 @@ class _ExploreState extends State<Explore> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image:NetworkImage(recipe.image),
+                      image: _getImageProvider(recipe.image),  // Use the new function
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -145,7 +174,7 @@ class _ExploreState extends State<Explore> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Detail(recipe: recipe)),
+          MaterialPageRoute(builder: (context) => Detail(recipe: recipe, userId: _user!.auth_id)),
         );
       },
       child: Container(
@@ -162,7 +191,7 @@ class _ExploreState extends State<Explore> {
               width: 160,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(recipe.image),
+                  image: _getImageProvider(recipe.image),  // Use the new function
                   fit: BoxFit.fitHeight,
                 ),
               ),
