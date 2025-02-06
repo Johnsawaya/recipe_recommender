@@ -56,7 +56,7 @@ The PostgreSQL database consists of:
 🎥 **Watch a recording of our app in action:**  
 
 <video width="600" controls>
-  <source src="Recipe Rec Video.mp4" type="video/mp4">
+  <source src="RecipeRecVideo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
  
