@@ -54,7 +54,12 @@ The PostgreSQL database consists of:
 
 ## **Demo Video**  
 🎥 **Watch a recording of our app in action:**  
-[Insert Video Link Here]  
+
+<video width="600" controls>
+  <source src="Recipe Rec Video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+ 
 
 ## **Future Enhancements**  
 **AI Meal Planning** – Implement smart meal generation based on dietary needs.  
