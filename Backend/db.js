@@ -2,10 +2,10 @@ require("dotenv").config();
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: "recipe_recommendationdb_user",
-  host: "dpg-cueabr1opnds738erc0g-a",
-  database: "recipe_recommendationdb",
-  password: "fWbabdmI4vt2ao12Jqu4ZnQgVCT0BB2N",
+  user: "recipe_recommendationdb_zsvn_user",
+  host: "dpg-cv2m8oan91rc73bvc3og-a",
+  database: "recipe_recommendationdb_zsvn",
+  password: "2UhvPlyf1rTCzkyVrA2oCAEhwl22ZMru",
   port: process.env.DB_PORT || 5432,
 });
 
