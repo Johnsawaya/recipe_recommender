@@ -1,12 +1,6 @@
 # **Personalized Recipe Recommender App**  
 
-## **Mobile Programming Course - Group 5**  
-**Team Members:**  
-- John Sawaya  
-- Charbel Kiwan  
-- Elie Bou Naoum  
-- Karen Kdeissy  
-- Elissa Merhi  
+## **Mobile Programming Course **
 
 ## **Overview**  
 The **Personalized Recipe Recommender App** is a user-centric meal planning application that helps users discover and track recipes based on their dietary goals. The app calculates daily calorie needs based on user input (age, height, weight, and goal) and recommends suitable recipes. Users can browse, save favorites, and explore a variety of dishes with detailed nutritional insights.  
